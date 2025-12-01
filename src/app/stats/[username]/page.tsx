@@ -1,9 +1,8 @@
+import { GitBranch, Star, User, UserCheck, UserPlus } from "lucide-react";
 import { type GithubStats, getGithubStats } from "@/lib/github";
 
-
-
-export default async function StatsPage(props:PageProps<'/stats/[username]'>) {
-  const userName = (await props.params).username
+export default async function StatsPage(props: PageProps<"/stats/[username]">) {
+  const userName = (await props.params).username;
 
   let stats: GithubStats | null = null;
   let error: string | null = null;
@@ -29,23 +28,43 @@ export default async function StatsPage(props:PageProps<'/stats/[username]'>) {
         {stats ? (
           <div className="mt-4">
             <div className="flex justify-between">
-              <p className="text-gray-600">UserName</p>
+              <div className="flex gap-2">
+                {" "}
+                <User />
+                <p className="text-gray-600">UserName</p>
+              </div>
               <p className="font-medium text-gray-800">{stats.username}</p>
             </div>
             <div className="flex justify-between mt-2">
-              <p className="text-gray-600">Followers</p>
+              <div className="flex gap-2">
+                {" "}
+                <UserCheck />
+                <p className="text-gray-600">Followers</p>
+              </div>
               <p className="font-medium text-gray-800">{stats.followers}</p>
             </div>
             <div className="flex justify-between mt-2">
-              <p className="text-gray-600">Following</p>
+              <div className="flex gap-2">
+                {" "}
+                <UserPlus />
+                <p className="text-gray-600">Following</p>
+              </div>
               <p className="font-medium text-gray-800">{stats.following}</p>
             </div>
             <div className="flex justify-between mt-2">
-              <p className="text-gray-600">Public Repos</p>
+              <div className="flex gap-2">
+                {" "}
+                <GitBranch />
+                <p className="text-gray-600">Public Repos</p>
+              </div>
               <p className="font-medium text-gray-800">{stats.publicRepos}</p>
             </div>
             <div className="flex justify-between mt-2">
-              <p className="text-gray-600">Stars</p>
+              <div className="flex gap-2">
+                {" "}
+                <Star />
+                <p className="text-gray-600">Stars</p>
+              </div>
               <p className="font-medium text-gray-800">{stats.stars}</p>
             </div>
           </div>
