@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { chromium } from 'playwright'
+import sharp from 'sharp'
 import { getGithubStats } from '@/lib/github'
 
 function isErrorWithMessage(error: unknown): error is { message: string } {
@@ -11,121 +11,96 @@ function isErrorWithMessage(error: unknown): error is { message: string } {
 	)
 }
 
+// Define the RouteContext for type safety, as it was implicitly used before
+interface RouteContext<T extends string> {
+	params: {
+		[K in GetRouteParameter<T>]: string
+	}
+}
+
+// Helper type to extract route parameters from a route string
+type GetRouteParameter<T extends string> = string extends T
+	? string
+	: T extends `${infer _Start}/[${infer Param}]/${infer Rest}`
+		? Param | GetRouteParameter<`/${Rest}`>
+		: T extends `${infer _Start}/[${infer Param}]`
+			? Param
+			: never
+
 export async function GET(
 	_request: NextRequest,
 	ctx: RouteContext<'/api/stats/[username]/image'>,
 ) {
-	const username = await ctx.params
+	const username = ctx.params.username
 
 	if (!username) {
 		return new NextResponse('Username is required', { status: 400 })
 	}
 
 	try {
-		const stats = await getGithubStats(username.username)
+		const stats = await getGithubStats(username)
 
-		// Generate HTML for the stats card
-		const htmlContent = `
-      <html style="background: transparent;">
-      <head>
-          <title>GitHub Stats Card</title>
-          <style>
-            /* Add your TailwindCSS equivalent styles here or link a CSS file */
-            body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; }
-            .card {
-              width: 320px; /* Equivalent to max-w-sm in Tailwind */
-              border-radius: 8px; /* rounded-lg */
-              border: 1px solid #e2e8f0; /* border-[var(--border-default)] */
-              background-color: #ffffff; /* bg-[var(--card-bg)] */
-              padding: 24px; /* p-6 */
-              box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
-            }
-            h1 {
-              font-size: 24px; /* text-2xl */
-              font-weight: bold; /* font-bold */
-              text-align: center; /* text-center */
-              margin-bottom: 16px; /* mb-4 */
-              color: #1a202c; /* text-[var(--text-primary)] */
-            }
-            .stat-item {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              margin-top: 12px; /* space-y-3 equivalent for items */
-            }
-            .stat-label {
-              display: flex;
-              align-items: center;
-              gap: 8px; /* gap-2 */
-              color: #718096; /* text-[var(--text-secondary)] */
-            }
-            .stat-value {
-              font-weight: 500; /* font-medium */
-              color: #1a202c; /* text-[var(--text-primary)] */
-            }
-            .lucide-icon {
-              /* Placeholder for lucide-react icons, not directly rendered as SVG here */
-              width: 18px;
-              height: 18px;
-              display: inline-block;
-              vertical-align: middle;
-            }
-          </style>
-      </head>
-      <body>
-          <div class="card">
-              <h1>GitHub Stats for ${stats.username}</h1>
-              <div class="stat-item">
-                  <div class="stat-label">
-                      <span class="lucide-icon">👤</span><p>UserName</p>
-                  </div>
-                  <p class="stat-value">${stats.username}</p>
-              </div>
-              <div class="stat-item">
-                  <div class="stat-label">
-                      <span class="lucide-icon">👥</span><p>Followers</p>
-                  </div>
-                  <p class="stat-value">${stats.followers}</p>
-              </div>
-              <div class="stat-item">
-                  <div class="stat-label">
-                      <span class="lucide-icon">👀</span><p>Following</p>
-                  </div>
-                  <p class="stat-value">${stats.following}</p>
-              </div>
-              <div class="stat-item">
-                  <div class="stat-label">
-                      <span class="lucide-icon">🌳</span><p>Public Repos</p>
-                  </div>
-                  <p class="stat-value">${stats.publicRepos}</p>
-              </div>
-              <div class="stat-item">
-                  <div class="stat-label">
-                      <span class="lucide-icon">⭐</span><p>Stars</p>
-                  </div>
-                  <p class="stat-value">${stats.stars}</p>
-              </div>
-          </div>
-      </body>
-      </html>
-    `
+		// SVG dimensions
+		const width = 360 // Adjusted for a slightly wider card to accommodate text
+		const height = 240
 
-		const browser = await chromium.launch()
-		const page = await browser.newPage()
-		await page.setContent(htmlContent, { waitUntil: 'domcontentloaded' }) // Changed to domcontentloaded for faster load
+		// Colors (corresponding to your Tailwind/CSS variables)
+		const bgColor = '#ffffff' // var(--card-bg)
+		const borderColor = '#e2e8f0' // var(--border-default)
+		const primaryTextColor = '#1a202c' // var(--text-primary)
+		const secondaryTextColor = '#718096' // var(--text-secondary)
 
-		const cardElement = await page.$('.card')
-		if (!cardElement) {
-			await browser.close()
-			return new NextResponse('Could not find card element', {
-				status: 500,
-			})
-		}
+		// SVG generation
+		const svgContent = `
+            <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="0.5" y="0.5" rx="8" width="${width - 1}" height="${height - 1}" fill="${bgColor}" stroke="${borderColor}"/>
 
-		const imageBuffer = await cardElement.screenshot({ type: 'png' })
-		await browser.close()
+                <style>
+                    .text-primary { fill: ${primaryTextColor}; }
+                    .text-secondary { fill: ${secondaryTextColor}; }
+                    .font-bold { font-weight: bold; }
+                    .font-medium { font-weight: 500; }
+                    .text-2xl { font-size: 24px; }
+                    .text-base { font-size: 16px; }
+                    .text-sm { font-size: 14px; }
+                    .text-center { text-anchor: middle; }
+                    .icon { font-family: 'Segoe UI Symbol', 'Apple Color Emoji', sans-serif; font-size: 18px; }
+                </style>
 
-		return new NextResponse(Buffer.from(imageBuffer), {
+                <text x="${width / 2}" y="36" class="text-2xl font-bold text-primary text-center">GitHub Stats for ${stats.username}</text>
+
+                <!-- Stats Items -->
+                ${[
+					{ label: 'UserName', value: stats.username, icon: '👤' },
+					{ label: 'Followers', value: stats.followers, icon: '👥' },
+					{ label: 'Following', value: stats.following, icon: '👀' },
+					{
+						label: 'Public Repos',
+						value: stats.publicRepos,
+						icon: '🌳',
+					},
+					{ label: 'Stars', value: stats.stars, icon: '⭐' },
+				]
+					.map((item, index) => {
+						const yOffset = 70 + index * 30 // Adjust spacing
+						return `
+                        <g>
+                            <text x="24" y="${yOffset}" class="text-sm icon">${item.icon}</text>
+                            <text x="48" y="${yOffset}" class="text-sm text-secondary">${item.label}</text>
+                            <text x="${width - 24}" y="${yOffset}" text-anchor="end" class="text-sm font-medium text-primary">${item.value}</text>
+                        </g>
+                    `
+					})
+					.join('')}
+            </svg>
+        `
+
+		const pngBuffer = await sharp(Buffer.from(svgContent))
+			.resize(width * 2, height * 2)
+			.png()
+			.toBuffer()
+
+		return new NextResponse(Buffer.from(pngBuffer), {
 			headers: {
 				'Content-Type': 'image/png',
 				'Cache-Control':

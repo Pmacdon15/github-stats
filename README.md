@@ -106,6 +106,3 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 *   **Playwright**: Headless browser for image generation (in API routes).
 *   **Lucide React**: Icon library.
 
-## License
-
-[Specify your license here, e.g., MIT License]
