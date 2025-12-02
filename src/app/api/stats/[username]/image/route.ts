@@ -31,7 +31,8 @@ export async function GET(
 	_request: NextRequest,
 	ctx: RouteContext<'/api/stats/[username]/image'>,
 ) {
-	const username = ctx.params.username
+	const params = await ctx.params
+	const username = params.username
 
 	if (!username) {
 		return new NextResponse('Username is required', { status: 400 })
