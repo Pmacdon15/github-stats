@@ -55,6 +55,13 @@ This will render an image like this:
 
 Feel free to replace `octocat` with your own GitHub username!
 
+### Quick Usage
+Copy the following code into your markdown file and replace `your-username` with your actual GitHub username:
+
+```markdown
+![GitHub Stats](https://gh-stats.patmac.ca/api/stats/your-username/image)
+```
+
 ## Getting Started (for Developers)
 
 To set up the project locally:
@@ -77,11 +84,7 @@ To set up the project locally:
     bun install
     # or npm install
     ```
-3.  Install Playwright browser binaries (required for the image API):
-    ```bash
-    bunx playwright install
-    # or npx playwright install
-    ```
+
 4.  Create a `.env.local` file in the root directory and add your GitHub Token:
     ```
     GITHUB_TOKEN=your_github_personal_access_token
@@ -103,6 +106,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 *   **React**: UI library.
 *   **Tailwind CSS**: Utility-first CSS framework.
 *   **Recharts**: Charting library for React.
-*   **Playwright**: Headless browser for image generation (in API routes).
+*   **Sharp**: High performance Node.js image processing (for API image generation).
 *   **Lucide React**: Icon library.
 
