@@ -1,5 +1,10 @@
 import { GitBranch, Star, User, UserCheck, UserPlus } from 'lucide-react'
-import { type GithubStats, getGithubStats } from '@/lib/github'
+import LanguagePieChart from '@/components/LanguagePieChart'
+import {
+	type GithubStats,
+	getGithubStats,
+	getLanguageDistribution,
+} from '@/lib/github'
 
 function isErrorWithMessage(error: unknown): error is { message: string } {
 	return (
@@ -14,7 +19,10 @@ export default async function StatsPage(props: PageProps<'/stats/[username]'>) {
 	const userName = (await props.params).username
 
 	let stats: GithubStats | null = null
-	let error: string | null = null
+	let statsError: string | null = null
+	let processedLanguageData: { language: string; bytes: number }[] | null =
+		null
+	let languageError: string | null = null
 
 	if (userName) {
 		try {
@@ -22,14 +30,57 @@ export default async function StatsPage(props: PageProps<'/stats/[username]'>) {
 		} catch (e: unknown) {
 			console.error(e)
 			if (isErrorWithMessage(e)) {
-				error = e.message
+				statsError = e.message
 			} else {
-				error = 'An unexpected error occurred.'
+				statsError = 'An unexpected error occurred.'
 			}
-			error = error || 'Failed to fetch GitHub stats.'
+			statsError = statsError || 'Failed to fetch GitHub stats.'
+		}
+
+		try {
+			const languageDistribution = await getLanguageDistribution(userName)
+
+			if (languageDistribution && languageDistribution.length > 0) {
+				const totalBytes = languageDistribution.reduce(
+					(sum, lang) => sum + lang.bytes,
+					0,
+				)
+				const thresholdPercentage = 2
+
+				const mainLanguages = languageDistribution.filter(
+					(lang) =>
+						(lang.bytes / totalBytes) * 100 >= thresholdPercentage,
+				)
+
+				const otherBytes = languageDistribution
+					.filter(
+						(lang) =>
+							(lang.bytes / totalBytes) * 100 <
+							thresholdPercentage,
+					)
+					.reduce((sum, lang) => sum + lang.bytes, 0)
+
+				processedLanguageData = [...mainLanguages]
+
+				if (otherBytes > 0) {
+					processedLanguageData.push({
+						language: 'Other',
+						bytes: otherBytes,
+					})
+				}
+			}
+		} catch (e: unknown) {
+			console.error(e)
+			if (isErrorWithMessage(e)) {
+				languageError = e.message
+			} else {
+				languageError = 'An unexpected error occurred.'
+			}
+			languageError =
+				languageError || 'Failed to fetch language distribution.'
 		}
 	} else {
-		error = 'No username provided in the URL.'
+		statsError = 'No username provided in the URL.'
 	}
 
 	return (
@@ -89,18 +140,31 @@ export default async function StatsPage(props: PageProps<'/stats/[username]'>) {
 					</div>
 				) : (
 					<p className="mt-4 text-center text-[var(--text-secondary)]">
-						{error ||
+						{statsError ||
 							'Failed to load stats for the provided username. Please ensure the username is correct and a GITHUB_TOKEN environment variable is set.'}
+					</p>
+				)}
+			</div>
+
+			<div className="mt-6 w-full max-w-sm rounded-lg border border-[var(--border-default)] bg-[var(--card-bg)] p-6 shadow-sm">
+				<h2 className="mb-4 text-center font-bold text-2xl text-[var(--text-primary)]">
+					Languages for {userName}
+				</h2>
+				{processedLanguageData && processedLanguageData.length > 0 ? (
+					<LanguagePieChart data={processedLanguageData} />
+				) : (
+					<p className="text-center text-[var(--text-secondary)]">
+						{languageError || 'No language data available.'}
 					</p>
 				)}
 			</div>
 
 			<div className="mt-6 w-full max-w-sm">
 				<a
-					className="block w-full rounded-md bg-[var(--success-emphasis)] px-4 py-2 text-center font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
-					href={`/stats/${userName}/chart`}
+					className="block w-full rounded-md bg-[var(--accent-color)] px-4 py-2 text-center font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
+					href="/"
 				>
-					View Language Chart
+					Back to Home
 				</a>
 			</div>
 		</main>

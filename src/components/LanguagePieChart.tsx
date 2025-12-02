@@ -16,10 +16,10 @@ interface LanguagePieChartProps {
 interface CustomLabelProps {
 	cx: number
 	cy: number
-	midAngle: number
+	midAngle?: number
 	innerRadius: number
 	outerRadius: number
-	percent: number
+	percent?: number
 	index: number
 	name?: string
 	value?: number
@@ -50,6 +50,10 @@ const LanguagePieChart: React.FC<LanguagePieChartProps> = ({ data }) => {
 		percent,
 		index,
 	}: CustomLabelProps) => {
+		if (midAngle === undefined || percent === undefined) {
+			return null
+		}
+
 		const radius = innerRadius + (outerRadius - innerRadius) * 0.5
 		const x = cx + radius * Math.cos((-midAngle * Math.PI) / 180)
 		const y = cy + radius * Math.sin((-midAngle * Math.PI) / 180)
