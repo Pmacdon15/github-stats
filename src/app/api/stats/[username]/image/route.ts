@@ -125,7 +125,7 @@ export async function GET(
 		const imageBuffer = await cardElement.screenshot({ type: 'png' })
 		await browser.close()
 
-		return new NextResponse(imageBuffer, {
+		return new NextResponse(Buffer.from(imageBuffer), {
 			headers: {
 				'Content-Type': 'image/png',
 				'Cache-Control':
