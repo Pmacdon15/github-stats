@@ -1,1 +1,44 @@
 @import "tailwindcss";
+
+:root {
+	/* GitHub Light Mode Variables */
+	--bg-canvas: #ffffff;
+	--bg-surface: #f6f8fa;
+	--text-primary: #24292f;
+	--text-secondary: #57606a;
+	--border-default: #d0d7de;
+	--accent-color: #0969da;
+	--card-bg: #ffffff;
+	--btn-bg: #f6f8fa;
+	--btn-border: rgba(27, 31, 36, 0.15);
+	--btn-hover-bg: #f3f4f6;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		/* GitHub Dark Mode Variables */
+		--bg-canvas: #0d1117;
+		--bg-surface: #161b22;
+		--text-primary: #c9d1d9;
+		--text-secondary: #8b949e;
+		--border-default: #30363d;
+		--accent-color: #58a6ff;
+		--card-bg: #161b22;
+		--btn-bg: #21262d;
+		--btn-border: #363b42;
+		--btn-hover-bg: #30363d;
+		--success-fg: #3fb950;
+		--success-emphasis: #238636;
+	}
+}
+
+:root {
+	/* ... existing vars ... */
+	--success-fg: #1a7f37;
+	--success-emphasis: #2da44e;
+}
+
+body {
+	color: var(--text-primary);
+	background-color: var(--bg-canvas);
+}
