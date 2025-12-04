@@ -106,6 +106,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 *   **React**: UI library.
 *   **Tailwind CSS**: Utility-first CSS framework.
 *   **Recharts**: Charting library for React.
-*   **Sharp**: High performance Node.js image processing (for API image generation).
+*   **@vercel/og**: Dynamic Open Graph Image generation.
 *   **Lucide React**: Icon library.
 

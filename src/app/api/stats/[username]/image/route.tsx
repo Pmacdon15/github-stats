@@ -1,0 +1,280 @@
+import {
+	GitBranchIcon,
+	StarIcon,
+	UserCheckIcon,
+	UserIcon,
+	UserPlusIcon,
+} from '@/lib/icons'
+import { ImageResponse } from 'next/og'
+import type { NextRequest } from 'next/server'
+import { getGithubStats } from '@/lib/github'
+
+export const runtime = 'edge'
+
+export async function GET(
+	_request: NextRequest,
+	props: { params: Promise<{ username: string }> },
+) {
+	const { username } = await props.params
+
+	if (!username) {
+		return new Response('Username is required', { status: 400 })
+	}
+
+	try {
+		const stats = await getGithubStats(username)
+
+		// Colors (matching CSS variables)
+		const cardBg = '#ffffff'
+		const borderDefault = '#e2e8f0'
+		const textPrimary = '#1a202c'
+		const textSecondary = '#718096'
+		const _accentColor = '#0969da'
+
+		return new ImageResponse(
+			<div
+				style={{
+					height: '100%',
+					width: '100%',
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center',
+					justifyContent: 'center',
+					backgroundColor: cardBg,
+					border: `1px solid ${borderDefault}`,
+					borderRadius: '8px',
+					padding: '24px',
+					fontFamily:
+						'-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+				}}
+			>
+				<div
+					style={{
+						display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'center',
+						width: '100%',
+					}}
+				>
+					<div
+						style={{
+							display: 'flex',
+							alignItems: 'center',
+							marginBottom: '16px',
+							color: textPrimary,
+						}}
+					>
+						<h1
+							style={{
+								fontSize: '24px',
+								fontWeight: 700,
+								margin: 0,
+							}}
+						>
+							Git Hub Stats for {stats.username}
+						</h1>
+					</div>
+
+					<div
+						style={{
+							display: 'flex',
+							flexDirection: 'column',
+							width: '100%',
+							gap: '12px',
+						}}
+					>
+						{/* UserName */}
+						<div
+							style={{
+								display: 'flex',
+								justifyContent: 'space-between',
+								alignItems: 'center',
+								width: '100%',
+							}}
+						>
+							<div
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									gap: '8px',
+									color: textSecondary,
+								}}
+							>
+								<img
+									width="18"
+									height="18"
+									src={`data:image/svg+xml;base64,${btoa(UserIcon)}`}
+								/>
+								<span style={{ fontSize: '14px' }}>
+									Username
+								</span>
+							</div>
+							<span
+								style={{
+									fontSize: '14px',
+									fontWeight: 500,
+									color: textPrimary,
+								}}
+							>
+								{stats.username}
+							</span>
+						</div>
+
+						{/* Followers */}
+						<div
+							style={{
+								display: 'flex',
+								justifyContent: 'space-between',
+								alignItems: 'center',
+								width: '100%',
+							}}
+						>
+							<div
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									gap: '8px',
+									color: textSecondary,
+								}}
+							>
+								<img
+									width="18"
+									height="18"
+									src={`data:image/svg+xml;base64,${btoa(UserCheckIcon)}`}
+								/>
+								<span style={{ fontSize: '14px' }}>
+									Followers
+								</span>
+							</div>
+							<span
+								style={{
+									fontSize: '14px',
+									fontWeight: 500,
+									color: textPrimary,
+								}}
+							>
+								{stats.followers}
+							</span>
+						</div>
+
+						{/* Following */}
+						<div
+							style={{
+								display: 'flex',
+								justifyContent: 'space-between',
+								alignItems: 'center',
+								width: '100%',
+							}}
+						>
+							<div
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									gap: '8px',
+									color: textSecondary,
+								}}
+							>
+								<img
+									width="18"
+									height="18"
+									src={`data:image/svg+xml;base64,${btoa(UserPlusIcon)}`}
+								/>
+								<span style={{ fontSize: '14px' }}>
+									Following
+								</span>
+							</div>
+							<span
+								style={{
+									fontSize: '14px',
+									fontWeight: 500,
+									color: textPrimary,
+								}}
+							>
+								{stats.following}
+							</span>
+						</div>
+
+						{/* Public Repos */}
+						<div
+							style={{
+								display: 'flex',
+								justifyContent: 'space-between',
+								alignItems: 'center',
+								width: '100%',
+							}}
+						>
+							<div
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									gap: '8px',
+									color: textSecondary,
+								}}
+							>
+								<img
+									width="18"
+									height="18"
+									src={`data:image/svg+xml;base64,${btoa(GitBranchIcon)}`}
+								/>
+								<span style={{ fontSize: '14px' }}>
+									Public Repos
+								</span>
+							</div>
+							<span
+								style={{
+									fontSize: '14px',
+									fontWeight: 500,
+									color: textPrimary,
+								}}
+							>
+								{stats.publicRepos}
+							</span>
+						</div>
+
+						{/* Stars */}
+						<div
+							style={{
+								display: 'flex',
+								justifyContent: 'space-between',
+								alignItems: 'center',
+								width: '100%',
+							}}
+						>
+							<div
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									gap: '8px',
+									color: textSecondary,
+								}}
+							>
+								<img
+									width="18"
+									height="18"
+									src={`data:image/svg+xml;base64,${btoa(StarIcon)}`}
+								/>
+								<span style={{ fontSize: '14px' }}>Stars</span>
+							</div>
+							<span
+								style={{
+									fontSize: '14px',
+									fontWeight: 500,
+									color: textPrimary,
+								}}
+							>
+								{stats.stars}
+							</span>
+						</div>
+					</div>
+				</div>
+			</div>,
+			{
+				width: 320,
+				height: 240,
+			},
+		)
+	} catch (error: unknown) {
+		console.error('Error generating image:', error)
+		return new Response('Failed to generate image', { status: 500 })
+	}
+}
