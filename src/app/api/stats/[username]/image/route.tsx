@@ -25,10 +25,10 @@ export async function GET(
 		const stats = await getGithubStats(username)
 
 		// Colors (matching CSS variables)
-		const cardBg = '#ffffff'
-		const borderDefault = '#e2e8f0'
-		const textPrimary = '#1a202c'
-		const textSecondary = '#718096'
+		const cardBg = '#1a202c'
+		const borderDefault = '#4a5568'
+		const textPrimary = '#ffffff'
+		const textSecondary = '#a0aec0'
 		const _accentColor = '#0969da'
 
 		return new ImageResponse(
