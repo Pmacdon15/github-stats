@@ -67,7 +67,9 @@ export async function GET(
 						<div
 							style={{
 								display: 'flex',
+								justifyContent: 'center',
 								alignItems: 'center',
+								width: '100%',
 								marginBottom: '16px',
 								color: textPrimary,
 								padding: '24px',
@@ -84,11 +86,11 @@ export async function GET(
 								style={{
 									fontSize: '24px',
 									fontWeight: 700,
-									marginLeft: 'auto',
-									marginRight: 'auto',
+									margin: 0,
+									textAlign: 'center',
 								}}
 							>
-								Git Hub Stats for {stats.username}
+								GitHub Stats for {stats.username}
 							</h1>
 						</div>
 
@@ -296,9 +298,9 @@ export async function GET(
 			{
 				width: 420,
 				height: 300,
-				headers: {
-					'Cache-Control': 's-maxage=3600, stale-while-revalidate',
-				},
+				// headers: {
+				// 	'Cache-Control': 's-maxage=3600, stale-while-revalidate',
+				// },
 			},
 		)
 	} catch (error: unknown) {
