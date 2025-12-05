@@ -203,7 +203,13 @@ export async function GET(
 						}}
 					>
 						{totalBytes > 0 ? (
-							<>
+							<div
+								style={{
+									flexDirection: 'row',
+									gap: '24px',
+									display: 'flex',
+								}}
+							>
 								<svg
 									height="150"
 									style={{
@@ -219,7 +225,7 @@ export async function GET(
 									style={{
 										display: 'flex',
 										flexDirection: 'column',
-										gap: '16px', // Add a gap between languages
+										gap: '8px', // Add a gap between languages
 									}}
 								>
 									{chartData.map(
@@ -261,7 +267,7 @@ export async function GET(
 										),
 									)}
 								</div>
-							</>
+							</div>
 						) : (
 							<span
 								style={{

@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import type { NextRequest } from 'next/server'
+import { type NextRequest } from 'next/server'
 import { getGithubStats } from '@/lib/github'
 import {
 	GhIcon,
@@ -23,6 +23,8 @@ export async function GET(
 	try {
 		const stats = await getGithubStats(username)
 
+		if ('error' in stats)
+			return new Response('Username is required', { status: 400 })
 		const textPrimary = '#ffffff'
 		const textSecondary = '#a0aec0'
 		const _accentColor = '#0969da'
@@ -88,7 +90,7 @@ export async function GET(
 									textAlign: 'center',
 								}}
 							>
-								GitHub Stats for {stats.username}
+								GitHub Stats for {username}
 							</h1>
 						</div>
 
@@ -134,7 +136,7 @@ export async function GET(
 										color: textPrimary,
 									}}
 								>
-									{stats.username}
+									{username}
 								</span>
 							</div>
 
