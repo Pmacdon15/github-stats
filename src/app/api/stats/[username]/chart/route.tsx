@@ -3,22 +3,22 @@ import type { NextRequest } from 'next/server'
 import { getLanguageDistribution } from '@/lib/github'
 import { GhIcon } from '@/lib/icons'
 
-
+interface LanguageData {
+	language: string
+	bytes: number
+}
 // Function to generate consistent colors for languages
 const getLanguageColor = (index: number) => {
 	const colors = [
-		'#954EA3', // Purple
-		'#2AFB3D', // Green
-		'#7B00F1', // Darker Purple
-		'#A771DA', // Lighter Purple
-		'#8A5470', // Brownish
-		'#0518FA', // Blue
-		'#FF5733', // Orange
-		'#33FF57', // Light Green
-		'#3357FF', // Light Blue
-		'#FF33FF', // Magenta
-		'#33FFFF', // Cyan
-		'#FFFF33', // Yellow
+		'#0088FE',
+		'#00C49F',
+		'#FFBB28',
+		'#FF8042',
+		'#AF19FF',
+		'#FF197D',
+		'#19FFFF',
+		'#FF9919',
+		'#82CA9D',
 	]
 	return colors[index % colors.length]
 }
@@ -33,12 +33,20 @@ export async function GET(
 		return new Response('Username is required', { status: 400 })
 	}
 
+	const textPrimary = '#ffffff'
+	const textSecondary = '#a0aec0'
 	try {
 		const languages = await getLanguageDistribution(username)
-		const textPrimary = '#ffffff'
-		const textSecondary = '#a0aec0'
 
-		// Process languages: top 5 and 'Other'
+		// Check if languages is an array
+		if (!Array.isArray(languages)) {
+			return new Response(
+				languages.error || 'Failed to fetch language data',
+				{ status: 500 },
+			)
+		}
+
+		// Now TypeScript knows languages is an array
 		const topLanguages = languages.slice(0, 5)
 		const otherLanguages = languages.slice(5)
 		const otherBytes = otherLanguages.reduce(
@@ -49,10 +57,7 @@ export async function GET(
 
 		const chartData =
 			otherBytes > 0
-				? [
-						...topLanguages,
-						{ language: 'Other', bytes: otherBytes },
-					]
+				? [...topLanguages, { language: 'Other', bytes: otherBytes }]
 				: topLanguages
 
 		// Helper functions for SVG pie chart
@@ -106,7 +111,7 @@ export async function GET(
 		const chartCenter = { x: 75, y: 75 } // Center of a 150x150 SVG viewbox
 
 		let currentAngle = 0
-		const pieSlices = chartData.map((lang, index) => {
+		const pieSlices = chartData.map((lang: LanguageData, index: number) => {
 			const angle = (lang.bytes / totalBytes) * 360
 			const color = getLanguageColor(index)
 			const startAngle = currentAngle
@@ -114,8 +119,10 @@ export async function GET(
 			currentAngle = endAngle
 
 			// Ensure the last slice goes to 360 to close the circle due to potential floating point errors
-			const finalEndAngle = index === chartData.length - 1 && currentAngle < 360 ? 360 : endAngle;
-
+			const finalEndAngle =
+				index === chartData.length - 1 && currentAngle < 360
+					? 360
+					: endAngle
 
 			const d = describeArc(
 				chartCenter.x,
@@ -125,13 +132,7 @@ export async function GET(
 				finalEndAngle,
 			)
 
-			return (
-				<path
-					key={lang.language}
-					d={d}
-					fill={color}
-				/>
-			)
+			return <path d={d} fill={color} key={lang.language} />
 		})
 
 		return new ImageResponse(
@@ -159,7 +160,7 @@ export async function GET(
 						padding: '24px',
 						fontFamily:
 							'-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-						boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Added shadow
+						boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
 					}}
 				>
 					<div
@@ -204,13 +205,13 @@ export async function GET(
 						{totalBytes > 0 ? (
 							<>
 								<svg
-									width="150"
 									height="150"
-									viewBox="0 0 150 150"
 									style={{
-										borderRadius: '50%', // Make it circular
-										boxShadow: '0 0 10px rgba(0,0,0,0.5)', // Apply shadow to the SVG itself
+										borderRadius: '50%',
+										boxShadow: '0 0 10px rgba(0,0,0,0.5)',
 									}}
+									viewBox="0 0 150 150"
+									width="150"
 								>
 									{pieSlices}
 								</svg>
@@ -218,46 +219,56 @@ export async function GET(
 									style={{
 										display: 'flex',
 										flexDirection: 'column',
-										gap: '8px',
+										gap: '16px', // Add a gap between languages
 									}}
 								>
-									{chartData.map((lang, index) => (
-										<div
-											key={lang.language}
-											style={{
-												display: 'flex',
-												alignItems: 'center',
-											}}
-										>
+									{chartData.map(
+										(lang: LanguageData, index: number) => (
 											<div
+												key={lang.language}
 												style={{
-													width: '10px',
-													height: '10px',
-													borderRadius: '50%',
-													backgroundColor:
-														getLanguageColor(index),
-													marginRight: '8px',
-												}}
-											/>
-											<span
-												style={{
-													color: textPrimary,
-													fontSize: '14px',
+													display: 'flex',
+													alignItems: 'center',
 												}}
 											>
-												{lang.language}:{' '}
-												{(
-													(lang.bytes / totalBytes) *
-													100
-												).toFixed(2)}
-												%
-											</span>
-										</div>
-									))}
+												<div
+													style={{
+														width: '10px',
+														height: '10px',
+														borderRadius: '50%',
+														backgroundColor:
+															getLanguageColor(
+																index,
+															),
+														marginRight: '8px',
+													}}
+												/>
+												<span
+													style={{
+														color: textPrimary,
+														fontSize: '14px',
+													}}
+												>
+													{lang.language}:{' '}
+													{(
+														(lang.bytes /
+															totalBytes) *
+														100
+													).toFixed(2)}
+													%
+												</span>
+											</div>
+										),
+									)}
 								</div>
 							</>
 						) : (
-							<span style={{ color: textSecondary, fontSize: '18px' }}>
+							<span
+								style={{
+									color: textSecondary,
+									fontSize: '18px',
+								}}
+							>
 								No language data available for this user.
 							</span>
 						)}
