@@ -69,6 +69,7 @@ export async function GET(
 								alignItems: 'center',
 								marginBottom: '16px',
 								color: textPrimary,
+								padding: '24px',
 							}}
 						>
 							<h1
@@ -284,8 +285,8 @@ export async function GET(
 				</div>
 			</div>,
 			{
-				width: 320,
-				height: 240,
+				width: 420,
+				height: 300,
 				// headers: {
 				// 	'Cache-Control': 's-maxage=3600, stale-while-revalidate',
 				// },
