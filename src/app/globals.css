@@ -12,6 +12,7 @@
 	--btn-bg: #f6f8fa;
 	--btn-border: rgba(27, 31, 36, 0.15);
 	--btn-hover-bg: #f3f4f6;
+	--icon-color:c#3fb950;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -29,6 +30,7 @@
 		--btn-hover-bg: #30363d;
 		--success-fg: #3fb950;
 		--success-emphasis: #238636;
+		--icon-color:#3fb950;
 	}
 }
 

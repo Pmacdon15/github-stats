@@ -2,6 +2,7 @@ import { ImageResponse } from 'next/og'
 import type { NextRequest } from 'next/server'
 import { getGithubStats } from '@/lib/github'
 import {
+	GhIcon,
 	GitBranchIcon,
 	StarIcon,
 	UserCheckIcon,
@@ -23,7 +24,7 @@ export async function GET(
 
 	try {
 		const stats = await getGithubStats(username)
-		
+
 		const textPrimary = '#ffffff'
 		const textSecondary = '#a0aec0'
 		const _accentColor = '#0969da'
@@ -72,11 +73,19 @@ export async function GET(
 								padding: '24px',
 							}}
 						>
+							<img
+								alt="Not for a browser"
+								height="24"
+								src={`data:image/svg+xml;base64,${btoa(GhIcon)}`}
+								style={{ marginRight: '12px' }}
+								width="24"
+							/>
 							<h1
 								style={{
 									fontSize: '24px',
 									fontWeight: 700,
-									margin: 0,
+									marginLeft: 'auto',
+									marginRight: 'auto',
 								}}
 							>
 								Git Hub Stats for {stats.username}
@@ -287,9 +296,9 @@ export async function GET(
 			{
 				width: 420,
 				height: 300,
-				// headers: {
-				// 	'Cache-Control': 's-maxage=3600, stale-while-revalidate',
-				// },
+				headers: {
+					'Cache-Control': 's-maxage=3600, stale-while-revalidate',
+				},
 			},
 		)
 	} catch (error: unknown) {

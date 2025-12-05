@@ -60,6 +60,7 @@ Copy the following code into your markdown file and replace `your-username` with
 
 ```markdown
 ![GitHub Stats](https://gh-stats.patmac.ca/api/stats/your-username/image)
+![GitHub Stats](https://gh-stats.patmac.ca/api/stats/your-username/chart)
 ```
 
 ## Getting Started (for Developers)
