@@ -7,13 +7,15 @@
 		"build": "next build",
 		"start": "next start",
 		"lint": "biome check --write --unsafe",
-		"format": "biome format --write"
+		"format": "biome format --write",
+		"postbuild": "next-sitemap --config next-sitemap.config.cjs"
 	},
 	"dependencies": {
 		"@vercel/analytics": "^1.6.1",
 		"@vercel/og": "^0.8.5",
 		"lucide-react": "^0.555.0",
 		"next": "^16.0.7",
+		"next-sitemap": "^4.2.3",
 		"react": "^19.2.1",
 		"react-dom": "^19.2.1",
 		"recharts": "^3.5.1",
