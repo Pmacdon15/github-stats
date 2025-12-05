@@ -24,13 +24,18 @@
 			},
 			"recommended": true,
 			"a11y": {
-				"useSemanticElements": "off"
+				"useSemanticElements": "off",
+				"noSvgWithoutTitle": "off"
 			},
 			"suspicious": {
 				"noArrayIndexKey": "off",
 				"noUnknownAtRules": "off"
+			},
+			"performance": {
+				"noImgElement": "off"
 			}
 		},
+
 		"domains": {
 			"next": "recommended",
 			"react": "recommended"

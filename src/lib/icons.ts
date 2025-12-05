@@ -1,4 +1,3 @@
-// biome-ignore lint/style/useNamingConvention: Not a React component
 export const GitBranchIcon = `
 <svg
   xmlns="http://www.w3.org/2000/svg"
@@ -6,7 +5,7 @@ export const GitBranchIcon = `
   height="18"
   viewBox="0 0 24 24"
   fill="none"
-  stroke="currentColor"
+  stroke="#3fb950"
   stroke-width="2"
   stroke-linecap="round"
   stroke-linejoin="round"
@@ -17,9 +16,8 @@ export const GitBranchIcon = `
   <circle cx="6" cy="18" r="3" />
   <path d="M18 9a9 9 0 0 1-9 9" />
 </svg>
-`;
+`
 
-// biome-ignore lint/style/useNamingConvention: Not a React component
 export const StarIcon = `
 <svg
   xmlns="http://www.w3.org/2000/svg"
@@ -27,16 +25,15 @@ export const StarIcon = `
   height="18"
   viewBox="0 0 24 24"
   fill="none"
-  stroke="currentColor"
+  stroke="#3fb950"
   stroke-width="2"
   stroke-linecap="round"
   stroke-linejoin="round"
 >
   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
 </svg>
-`;
+`
 
-// biome-ignore lint/style/useNamingConvention: Not a React component
 export const UserIcon = `
 <svg
   xmlns="http://www.w3.org/2000/svg"
@@ -44,7 +41,7 @@ export const UserIcon = `
   height="18"
   viewBox="0 0 24 24"
   fill="none"
-  stroke="currentColor"
+  stroke="#3fb950"
   stroke-width="2"
   stroke-linecap="round"
   stroke-linejoin="round"
@@ -52,9 +49,8 @@ export const UserIcon = `
   <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
   <circle cx="12" cy="7" r="4" />
 </svg>
-`;
+`
 
-// biome-ignore lint/style/useNamingConvention: Not a React component
 export const UserCheckIcon = `
 <svg
   xmlns="http://www.w3.org/2000/svg"
@@ -62,7 +58,7 @@ export const UserCheckIcon = `
   height="18"
   viewBox="0 0 24 24"
   fill="none"
-  stroke="currentColor"
+  stroke="#3fb950"
   stroke-width="2"
   stroke-linecap="round"
   stroke-linejoin="round"
@@ -71,9 +67,8 @@ export const UserCheckIcon = `
   <circle cx="9" cy="7" r="4" />
   <polyline points="16 11 18 13 22 9" />
 </svg>
-`;
+`
 
-// biome-ignore lint/style/useNamingConvention: Not a React component
 export const UserPlusIcon = `
 <svg
   xmlns="http://www.w3.org/2000/svg"
@@ -81,7 +76,7 @@ export const UserPlusIcon = `
   height="18"
   viewBox="0 0 24 24"
   fill="none"
-  stroke="currentColor"
+  stroke="#3fb950"
   stroke-width="2"
   stroke-linecap="round"
   stroke-linejoin="round"
@@ -91,4 +86,4 @@ export const UserPlusIcon = `
   <line x1="19" x2="19" y1="8" y2="14"/>
   <line x1="22" x2="16" y1="11" y2="11"/>
 </svg>
-`;
+`
