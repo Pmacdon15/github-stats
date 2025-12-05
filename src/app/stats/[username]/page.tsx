@@ -3,8 +3,8 @@ import { Suspense } from 'react'
 import LanguageCard from '@/components/language-card'
 import MainPageHeader from '@/components/main-page-header'
 import StatsCard from '@/components/page/stats-card'
-import { getGithubStats, getLanguageDistribution } from '@/lib/github'
 import Spinner from '@/components/spinner'
+import { getGithubStats, getLanguageDistribution } from '@/lib/github'
 
 export default async function StatsPage(props: PageProps<'/stats/[username]'>) {
 	const userNamePromise = props.params.then((params) => params.username)
@@ -31,7 +31,7 @@ export default async function StatsPage(props: PageProps<'/stats/[username]'>) {
 				fallback={
 					<div className="mt-6 w-full max-w-sm rounded-lg border border-(--border-default) bg-(--card-bg) p-6 shadow-sm">
 						<h2 className="text-(--text-primary)] mb-4 text-center font-bold text-2xl flex flex-col gap-2">
-							Languages loading <Spinner/>
+							Languages loading <Spinner />
 						</h2>
 					</div>
 				}
