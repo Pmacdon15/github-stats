@@ -6,14 +6,25 @@ export default async function LanguageCard({
 	languagePromise,
 	userNamePromise,
 }: {
-	languagePromise: Promise<{ language: string; bytes: number }[]>
+	languagePromise: Promise<
+		{ language: string; bytes: number }[] | { error: string }
+	>
 	userNamePromise: Promise<string>
 }) {
 	const languageDistribution = await languagePromise
 
 	let processedLanguageData: { language: string; bytes: number }[] | null =
-		null
-	let languageError: string | null = null
+		null	
+
+	if ('error' in languageDistribution) {
+		return (
+			<div className="mt-4 space-y-3">
+				<p className="text-lg font-medium text-(--text-primary)">
+					Oops, couldn't load GitHub stats!
+				</p>
+			</div>
+		)
+	}
 
 	try {
 		if (languageDistribution && languageDistribution.length > 0) {
@@ -45,9 +56,7 @@ export default async function LanguageCard({
 			}
 		}
 	} catch (e: unknown) {
-		console.error(e)
-		languageError =
-			languageError || 'Failed to fetch language distribution.'
+		console.error(e)		
 	}
 
 	return (
@@ -55,12 +64,8 @@ export default async function LanguageCard({
 			<Suspense>
 				<LanguagesChartHeader userNamePromise={userNamePromise} />
 			</Suspense>
-			{processedLanguageData && processedLanguageData.length > 0 ? (
+			{processedLanguageData && processedLanguageData.length > 0 && (
 				<LanguagePieChart data={processedLanguageData} />
-			) : (
-				<p className="text-center text-(--text-secondary)">
-					{languageError || 'No language data available.'}
-				</p>
 			)}
 		</div>
 	)

@@ -55,16 +55,84 @@ export async function GET(
 					]
 				: topLanguages
 
-		// Create the conic-gradient for the pie chart with rounded percentages
-		let gradient = 'conic-gradient('
+		// Helper functions for SVG pie chart
+		const polarToCartesian = (
+			centerX: number,
+			centerY: number,
+			radius: number,
+			angleInDegrees: number,
+		) => {
+			const angleInRadians = (angleInDegrees - 90) * (Math.PI / 180)
+			return {
+				x: centerX + radius * Math.cos(angleInRadians),
+				y: centerY + radius * Math.sin(angleInRadians),
+			}
+		}
+
+		const describeArc = (
+			x: number,
+			y: number,
+			radius: number,
+			startAngle: number,
+			endAngle: number,
+		) => {
+			const start = polarToCartesian(x, y, radius, endAngle)
+			const end = polarToCartesian(x, y, radius, startAngle)
+
+			const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1'
+
+			const d = [
+				'M',
+				start.x,
+				start.y,
+				'A',
+				radius,
+				radius,
+				0,
+				largeArcFlag,
+				0,
+				end.x,
+				end.y,
+				'L',
+				x,
+				y,
+				'Z',
+			].join(' ')
+
+			return d
+		}
+
+		const chartRadius = 75
+		const chartCenter = { x: 75, y: 75 } // Center of a 150x150 SVG viewbox
+
 		let currentAngle = 0
-		chartData.forEach((lang, index) => {
-			const angle = parseFloat(((lang.bytes / totalBytes) * 360).toFixed(2)) // Angle in degrees
+		const pieSlices = chartData.map((lang, index) => {
+			const angle = (lang.bytes / totalBytes) * 360
 			const color = getLanguageColor(index)
-			currentAngle += angle
-			gradient += `${color} ${currentAngle.toFixed(2)}deg, `
+			const startAngle = currentAngle
+			const endAngle = currentAngle + angle
+			currentAngle = endAngle
+
+			// Ensure the last slice goes to 360 to close the circle due to potential floating point errors
+			const finalEndAngle = index === chartData.length - 1 && currentAngle < 360 ? 360 : endAngle;
+
+
+			const d = describeArc(
+				chartCenter.x,
+				chartCenter.y,
+				chartRadius,
+				startAngle,
+				finalEndAngle,
+			)
+
+			return (
+				<path
+					key={lang.language}
+					d={d}
+					fill={color}
+				/>
+			)
 		})
-		gradient = `${gradient.slice(0, -2)})`
 
 		return new ImageResponse(
 			<div
@@ -91,6 +159,7 @@ export async function GET(
 						padding: '24px',
 						fontFamily:
 							'-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+						boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Added shadow
 					}}
 				>
 					<div
@@ -134,15 +203,17 @@ export async function GET(
 					>
 						{totalBytes > 0 ? (
 							<>
-								<div
+								<svg
+									width="150"
+									height="150"
+									viewBox="0 0 150 150"
 									style={{
-										width: '150px',
-										height: '150px',
-										borderRadius: '50%',
-										background: gradient,
-										boxShadow: '0 0 10px rgba(0,0,0,0.5)',
+										borderRadius: '50%', // Make it circular
+										boxShadow: '0 0 10px rgba(0,0,0,0.5)', // Apply shadow to the SVG itself
 									}}
-								/>
+								>
+									{pieSlices}
+								</svg>
 								<div
 									style={{
 										display: 'flex',

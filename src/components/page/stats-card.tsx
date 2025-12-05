@@ -1,12 +1,22 @@
-import { type GithubStats } from '@/lib/github'
-import { User, UserCheck, UserPlus, GitBranch, Star } from 'lucide-react'
+import { GitBranch, Star, User, UserCheck, UserPlus } from 'lucide-react'
+import type { GithubStats } from '@/lib/github'
 
 export default async function StatsCard({
 	statsPromise,
 }: {
-	statsPromise: Promise<GithubStats>
+	statsPromise: Promise<GithubStats | { error: string }>
 }) {
 	const stats = await statsPromise
+
+	if ('error' in stats) {
+		return (
+			<div className="mt-4 space-y-3">
+				<p className="text-lg font-medium text-(--text-primary)">
+					Oops, couldn't load GitHub stats!
+				</p>
+			</div>
+		)
+	}
 
 	return (
 		<div className="mt-4 space-y-3">

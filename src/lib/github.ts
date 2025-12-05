@@ -54,7 +54,9 @@ export type GithubStats = {
 	stars: number
 }
 
-export async function getGithubStats(username: string): Promise<GithubStats> {
+export async function getGithubStats(
+	username: string,
+): Promise<GithubStats | { error: string }> {
 	const userResponse = await fetch(
 		`https://api.github.com/users/${username}`,
 		{
@@ -65,7 +67,7 @@ export async function getGithubStats(username: string): Promise<GithubStats> {
 	const user: GitHubUserResponse = await userResponse.json()
 
 	if (isGitHubAPIError(user)) {
-		throw new Error(user.message)
+		return { error: user.message }
 	}
 
 	// Now 'user' is correctly narrowed to GitHubUser
@@ -88,7 +90,7 @@ export async function getGithubStats(username: string): Promise<GithubStats> {
 		if (isGitHubAPIError(reposData)) {
 			console.error('GitHub API Error (repos):', reposData)
 
-			throw new Error(reposData.message)
+			return { error: reposData.message }
 		} else {
 			// Fallback for unexpected non-array response
 
@@ -98,13 +100,11 @@ export async function getGithubStats(username: string): Promise<GithubStats> {
 				reposData,
 			)
 
-			throw new Error(
-				'Failed to fetch repositories: Unexpected response format.',
-			)
+			return {
+				error: 'Failed to fetch repositories: Unexpected response format.',
+			}
 		}
 	}
-
-	// Now `reposData` is guaranteed to be GitHubRepo[]
 
 	const repos: GitHubRepo[] = reposData
 
@@ -129,7 +129,7 @@ export async function getGithubStats(username: string): Promise<GithubStats> {
 
 export async function getLanguageDistribution(
 	username: string,
-): Promise<{ language: string; bytes: number }[]> {
+): Promise<{ language: string; bytes: number }[] | { error: string }> {
 	const languageBytes: { [key: string]: number } = {}
 
 	let allRepos: GitHubRepo[] = []
@@ -161,7 +161,7 @@ export async function getLanguageDistribution(
 					reposData,
 				)
 
-				throw new Error(reposData.message)
+				return { error: reposData.message }
 			} else {
 				// Fallback for unexpected non-array response
 
@@ -171,9 +171,9 @@ export async function getLanguageDistribution(
 					reposData,
 				)
 
-				throw new Error(
-					'Failed to fetch repositories for language distribution: Unexpected response format.',
-				)
+				return {
+					error: 'Failed to fetch repositories for language distribution: Unexpected response format.',
+				}
 			}
 		}
 
@@ -203,7 +203,7 @@ export async function getLanguageDistribution(
 
 			console.error('GitHub API Error (languages for repo):', languages)
 
-			throw new Error(languages.message)
+			return { error: languages.message }
 		}
 
 		// Now `languages` is guaranteed to be LanguageBytes
