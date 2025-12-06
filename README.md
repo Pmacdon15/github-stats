@@ -15,7 +15,7 @@ This project provides a simple web interface to visualize key GitHub statistics 
 
 ## How it Works
 
-The application fetches data from the GitHub API. When a username is entered:
+The application fetches data from the GitHub API, utilizing both its REST and GraphQL endpoints. By leveraging the GraphQL API, we achieve faster and more efficient data retrieval for language distribution. When a username is entered:
 1.  It queries the GitHub API for the user's profile information.
 2.  It then fetches all public repositories for that user.
 3.  For each repository, it retrieves the language usage data.
@@ -77,7 +77,7 @@ To set up the project locally:
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/<your-repo>/github-stats.git
+    git clone https://github.com/Pmacdon15/github-stats.git
     cd github-stats
     ```
 2.  Install dependencies:
@@ -105,6 +105,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 *   **Next.js**: React framework for building web applications.
 *   **TypeScript**: Type-safe JavaScript.
 *   **React**: UI library.
+*   **GraphQL**: Query language for your API, used for efficient data fetching from GitHub.
 *   **Tailwind CSS**: Utility-first CSS framework.
 *   **Recharts**: Charting library for React.
 *   **@vercel/og**: Dynamic Open Graph Image generation.
