@@ -298,9 +298,9 @@ export async function GET(
 			{
 				width: 420,
 				height: 300,
-				// headers: {
-				// 	'Cache-Control': 's-maxage=3600, stale-while-revalidate',
-				// },
+				headers: {
+					'Cache-Control': 's-maxage=3600, stale-while-revalidate',
+				},
 			},
 		)
 	} catch (error: unknown) {

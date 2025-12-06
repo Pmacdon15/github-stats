@@ -43,17 +43,17 @@ Replace `<username>` with the GitHub username you want to display stats for.
 
 ### Example
 
-To display the stats card for the user `octocat`, you would use the following Markdown:
+To display the stats card for the user /<username>`, you would use the following Markdown:
 
 ```markdown
-![GitHub Stats](https://gh-stats.patmac.ca/api/stats/octocat/image)
+![GitHub Stats](https://gh-stats.patmac.ca/api/stats/<username>/image)
 ```
 
 This will render an image like this:
 
-![GitHub Stats](https://gh-stats.patmac.ca/api/stats/octocat/image)
+![GitHub Stats](https://gh-stats.patmac.ca/api/stats/<username>/image)
 
-Feel free to replace `octocat` with your own GitHub username!
+Feel free to replace <username>` with your own GitHub username!
 
 ### Quick Usage
 Copy the following code into your markdown file and replace `your-username` with your actual GitHub username:
