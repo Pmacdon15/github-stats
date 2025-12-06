@@ -11,9 +11,9 @@ interface GitHubRepo {
 	languages_url: string
 }
 
-interface LanguageBytes {
-	[key: string]: number
-}
+// interface LanguageBytes {
+// 	[key: string]: number
+// }
 
 interface GitHubAPIError {
 	message: string
@@ -22,7 +22,7 @@ interface GitHubAPIError {
 
 type GitHubUserResponse = GitHubUser | GitHubAPIError
 type GitHubRepoResponse = GitHubRepo[] | GitHubAPIError
-type GitHubLanguagesResponse = LanguageBytes | GitHubAPIError
+// type GitHubLanguagesResponse = LanguageBytes | GitHubAPIError
 
 function isGitHubAPIError(response: unknown): response is GitHubAPIError {
 	return (
@@ -44,85 +44,56 @@ function getAuthHeaders(): Record<string, string> {
 
 export type GithubStats = {
 	username: string
-
 	followers: number
-
 	following: number
-
 	publicRepos: number
-
 	stars: number
 }
 
 export async function getGithubStats(
 	username: string,
 ): Promise<GithubStats | { error: string }> {
-	const userResponse = await fetch(
-		`https://api.github.com/users/${username}`,
-		{
-			headers: getAuthHeaders(),
-		},
-	)
+	const headers = getAuthHeaders()
 
-	const user: GitHubUserResponse = await userResponse.json()
+	const [userResult, reposResult] = await Promise.all([
+		fetch(`https://api.github.com/users/${username}`, {
+			headers,
+		}).then((res) => res.json()),
+		fetch(`https://api.github.com/users/${username}/repos?per_page=100`, {
+			headers,
+		}).then((res) => res.json()),
+	])
 
+	const user = userResult as GitHubUserResponse
 	if (isGitHubAPIError(user)) {
 		return { error: user.message }
 	}
 
-	// Now 'user' is correctly narrowed to GitHubUser
-
-	const reposResponse = await fetch(
-		`https://api.github.com/users/${username}/repos?per_page=100`,
-
-		{
-			headers: getAuthHeaders(),
-		},
-	)
-
-	const reposData: GitHubRepoResponse = await reposResponse.json()
-
-	// Type guard to check if it's an array of repos
-
-	if (!Array.isArray(reposData)) {
-		// If it's not an array, it must be a GitHubAPIError
-
-		if (isGitHubAPIError(reposData)) {
-			console.error('GitHub API Error (repos):', reposData)
-
-			return { error: reposData.message }
-		} else {
-			// Fallback for unexpected non-array response
-
-			console.error(
-				'GitHub API Error (repos): Unexpected non-array response',
-
-				reposData,
-			)
-
-			return {
-				error: 'Failed to fetch repositories: Unexpected response format.',
-			}
+	const repos = reposResult as GitHubRepoResponse
+	if (!Array.isArray(repos)) {
+		if (isGitHubAPIError(repos)) {
+			console.error('GitHub API Error (repos):', repos)
+			return { error: repos.message }
+		}
+		console.error(
+			'GitHub API Error (repos): Unexpected non-array response',
+			repos,
+		)
+		return {
+			error: 'Failed to fetch repositories: Unexpected response format.',
 		}
 	}
 
-	const repos: GitHubRepo[] = reposData
-
 	const stars = repos.reduce(
 		(acc: number, repo: GitHubRepo) => acc + (repo.stargazers_count ?? 0),
-
 		0,
 	)
 
 	return {
 		username: user.login,
-
 		followers: user.followers,
-
 		following: user.following,
-
 		publicRepos: user.public_repos,
-
 		stars,
 	}
 }
@@ -130,100 +101,94 @@ export async function getGithubStats(
 export async function getLanguageDistribution(
 	username: string,
 ): Promise<{ language: string; bytes: number }[] | { error: string }> {
+	const headers = getAuthHeaders()
+	const graphqlEndpoint = 'https://api.github.com/graphql'
+
+	const query = `
+    query($username: String!, $cursor: String) {
+      user(login: $username) {
+        repositories(first: 100, after: $cursor, ownerAffiliations: OWNER, isFork: false) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+          nodes {
+            languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
+              edges {
+                size
+                node {
+                  name
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `
+
 	const languageBytes: { [key: string]: number } = {}
+	let hasNextPage = true
+	let cursor: string | null = null
 
-	let allRepos: GitHubRepo[] = []
+	try {
+		while (hasNextPage) {
+			const response: Response = await fetch(graphqlEndpoint, {
+				method: 'POST',
+				headers: {
+					...headers,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					query,
+					variables: { username, cursor },
+				}),
+			})
 
-	let page = 1
+			if (!response.ok) {
+				throw new Error(`GitHub API responded with ${response.status}`)
+			}
 
-	let hasMoreRepos = true
+			const result = await response.json()
 
-	while (hasMoreRepos) {
-		const reposResponse = await fetch(
-			`https://api.github.com/users/${username}/repos?per_page=100&page=${page}`,
-
-			{
-				headers: getAuthHeaders(),
-			},
-		)
-
-		const reposData: GitHubRepoResponse = await reposResponse.json()
-
-		// Type guard to check if it's an array of repos
-
-		if (!Array.isArray(reposData)) {
-			// If it's not an array, it must be a GitHubAPIError
-
-			if (isGitHubAPIError(reposData)) {
-				console.error(
-					'GitHub API Error (language distribution):',
-
-					reposData,
+			if (result.errors) {
+				console.error('GitHub GraphQL API Error:', result.errors)
+				throw new Error(
+					result.errors[0].message || 'Error fetching language data.',
 				)
+			}
 
-				return { error: reposData.message }
-			} else {
-				// Fallback for unexpected non-array response
+			const repositories = result.data?.user?.repositories
+			if (!repositories) {
+				// This can happen if the user is not found, GraphQL returns data: { user: null }
+				return { error: `User '${username}' not found.` }
+			}
 
-				console.error(
-					'GitHub API Error (language distribution): Unexpected non-array response',
-
-					reposData,
-				)
-
-				return {
-					error: 'Failed to fetch repositories for language distribution: Unexpected response format.',
+			for (const repo of repositories.nodes) {
+				for (const lang of repo.languages.edges) {
+					const { name } = lang.node
+					const { size } = lang
+					if (languageBytes[name]) {
+						languageBytes[name] += size
+					} else {
+						languageBytes[name] = size
+					}
 				}
 			}
+
+			hasNextPage = repositories.pageInfo.hasNextPage
+			cursor = repositories.pageInfo.endCursor
 		}
 
-		const repos: GitHubRepo[] = reposData
-
-		if (repos.length === 0) {
-			hasMoreRepos = false
-		} else {
-			allRepos = allRepos.concat(repos)
-
-			page++
-		}
+		return Object.entries(languageBytes)
+			.map(([language, bytes]) => ({ language, bytes }))
+			.sort((a, b) => b.bytes - a.bytes)
+	} catch (error: unknown) {
+		console.error('Error in getLanguageDistribution:', error)
+		const message =
+			error instanceof Error
+				? error.message
+				: 'An unknown error occurred.'
+		return { error: message }
 	}
-
-	for (const repo of allRepos) {
-		if (repo.fork) continue
-
-		const languagesResponse = await fetch(repo.languages_url, {
-			headers: getAuthHeaders(),
-		})
-
-		const languages: GitHubLanguagesResponse =
-			await languagesResponse.json()
-
-		if (isGitHubAPIError(languages)) {
-			// Check for error message in languages response
-
-			console.error('GitHub API Error (languages for repo):', languages)
-
-			return { error: languages.message }
-		}
-
-		// Now `languages` is guaranteed to be LanguageBytes
-
-		for (const lang in languages) {
-			if (typeof languages[lang] === 'number') {
-				// Ensure it's a number, not the 'message' property
-
-				if (languageBytes[lang]) {
-					languageBytes[lang] += languages[lang]
-				} else {
-					languageBytes[lang] = languages[lang]
-				}
-			}
-		}
-	}
-
-	return Object.entries(languageBytes)
-
-		.map(([language, bytes]) => ({ language, bytes }))
-
-		.sort((a, b) => b.bytes - a.bytes) // Sort by bytes in descending order
 }
