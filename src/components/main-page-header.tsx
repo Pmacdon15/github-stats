@@ -1,4 +1,4 @@
-import { Github } from 'lucide-react'
+import { GitHubIcon } from './icons.github'
 
 export default async function MainPageHeader({
 	userNamePromise,
@@ -8,7 +8,7 @@ export default async function MainPageHeader({
 	const userName = await userNamePromise
 	return (
 		<div className="flex text-center ">
-			<Github color="#3fb950" />
+			<GitHubIcon />
 			<h1 className="font-bold text-(--text-primary) text-2xl">
 				GitHub Stats for {userName}
 			</h1>

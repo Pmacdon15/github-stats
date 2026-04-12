@@ -1,8 +1,8 @@
 'use client'
 
-import { Github } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { GitHubIcon } from '@/components/icons.github'
 
 export default function Home() {
 	const [username, setUsername] = useState('')
@@ -18,10 +18,7 @@ export default function Home() {
 	return (
 		<main className="flex min-h-screen flex-col items-center justify-center bg-[var(--bg-canvas)] p-4">
 			<div className="w-full max-w-md rounded-lg border border-[var(--border-default)] bg-[var(--card-bg)] p-8 text-center shadow-sm">
-				<Github
-					className="mx-auto mb-4 text-[var(--text-primary)]"
-					size={48}
-				/>
+				<GitHubIcon />
 				<h1 className="mb-6 font-bold text-3xl text-[var(--text-primary)]">
 					GitHub Stats
 				</h1>
@@ -52,7 +49,7 @@ export default function Home() {
 						rel="noopener noreferrer"
 						target="_blank"
 					>
-						<Github size={16} />
+						<GitHubIcon />
 						View Source on GitHub
 					</a>
 				</div>
