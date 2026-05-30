@@ -7,7 +7,7 @@ export default async function MainPageHeader({
 }) {
 	const userName = await userNamePromise
 	return (
-		<div className="flex text-center ">
+		<div className="flex text-center">
 			<GitHubIcon />
 			<h1 className="font-bold text-(--text-primary) text-2xl">
 				GitHub Stats for {userName}

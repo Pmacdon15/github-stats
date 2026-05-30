@@ -11,7 +11,7 @@ export default async function StatsCard({
 	if ('error' in stats) {
 		return (
 			<div className="mt-4 space-y-3">
-				<p className="text-lg font-medium text-(--text-primary)">
+				<p className="font-medium text-(--text-primary) text-lg">
 					Oops, couldn't load GitHub stats!
 				</p>
 			</div>

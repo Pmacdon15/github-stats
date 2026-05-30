@@ -20,7 +20,7 @@ export default async function LanguageCard({
 		return (
 			<div className="mt-6 w-full max-w-sm rounded-lg border border-(--border-default) bg-(--card-bg) p-6 shadow-sm">
 				<div className="mt-4 space-y-3">
-					<p className="text-lg font-medium text-(--text-primary)">
+					<p className="font-medium text-(--text-primary) text-lg">
 						Oops, couldn't load GitHub languages!
 					</p>
 				</div>

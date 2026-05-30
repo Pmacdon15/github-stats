@@ -30,7 +30,7 @@ export default async function StatsPage(props: PageProps<'/stats/[username]'>) {
 			<Suspense
 				fallback={
 					<div className="mt-6 w-full max-w-sm rounded-lg border border-(--border-default) bg-(--card-bg) p-6 shadow-sm">
-						<h2 className="text-(--text-primary)] mb-4 text-center font-bold text-2xl flex flex-col gap-2">
+						<h2 className="text-(--text-primary)] mb-4 flex flex-col gap-2 text-center font-bold text-2xl">
 							Languages loading <Spinner />
 						</h2>
 					</div>

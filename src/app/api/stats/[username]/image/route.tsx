@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import { type NextRequest } from 'next/server'
+import type { NextRequest } from 'next/server'
 import { getGithubStats } from '@/lib/github'
 import {
 	GhIcon,
@@ -77,10 +77,10 @@ export async function GET(
 						>
 							<img
 								alt="Not for a browser"
-								height="24"
+								height={24}
 								src={`data:image/svg+xml;base64,${btoa(GhIcon)}`}
 								style={{ marginRight: '12px' }}
-								width="24"
+								width={24}
 							/>
 							<h1
 								style={{
@@ -121,9 +121,9 @@ export async function GET(
 								>
 									<img
 										alt="Not for a browser"
-										height="18"
+										height={18}
 										src={`data:image/svg+xml;base64,${btoa(UserIcon)}`}
-										width="18"
+										width={18}
 									/>
 									<span style={{ fontSize: '14px' }}>
 										Username
@@ -159,9 +159,9 @@ export async function GET(
 								>
 									<img
 										alt="Not for a browser"
-										height="18"
+										height={18}
 										src={`data:image/svg+xml;base64,${btoa(UserCheckIcon)}`}
-										width="18"
+										width={18}
 									/>
 									<span style={{ fontSize: '14px' }}>
 										Followers
@@ -197,9 +197,9 @@ export async function GET(
 								>
 									<img
 										alt="Not for a browser"
-										height="18"
+										height={18}
 										src={`data:image/svg+xml;base64,${btoa(UserPlusIcon)}`}
-										width="18"
+										width={18}
 									/>
 									<span style={{ fontSize: '14px' }}>
 										Following
@@ -235,9 +235,9 @@ export async function GET(
 								>
 									<img
 										alt="Not for a browser"
-										height="18"
+										height={18}
 										src={`data:image/svg+xml;base64,${btoa(GitBranchIcon)}`}
-										width="18"
+										width={18}
 									/>
 									<span style={{ fontSize: '14px' }}>
 										Public Repos
@@ -273,9 +273,9 @@ export async function GET(
 								>
 									<img
 										alt="Not for a browser"
-										height="18"
+										height={18}
 										src={`data:image/svg+xml;base64,${btoa(StarIcon)}`}
-										width="18"
+										width={18}
 									/>
 									<span style={{ fontSize: '14px' }}>
 										Stars

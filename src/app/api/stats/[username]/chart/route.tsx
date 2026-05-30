@@ -175,10 +175,10 @@ export async function GET(
 					>
 						<img
 							alt="Not for a browser"
-							height="24"
+							height={24}
 							src={`data:image/svg+xml;base64,${btoa(GhIcon)}`}
 							style={{ marginRight: '12px' }}
-							width="24"
+							width={24}
 						/>
 						<h1
 							style={{
